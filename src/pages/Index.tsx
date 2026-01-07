@@ -35,7 +35,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen gradient-bg">
+    <div className="min-h-screen bg-background">
       <Sidebar
         activeTab={activeTab}
         onTabChange={setActiveTab}
@@ -44,8 +44,8 @@ const Index = () => {
       />
       <main
         className={cn(
-          "transition-all duration-300 p-6 lg:p-8",
-          isSidebarCollapsed ? "ml-20" : "ml-[280px]"
+          "transition-all duration-200 p-6 lg:p-8",
+          isSidebarCollapsed ? "ml-16" : "ml-60"
         )}
       >
         <div className="max-w-7xl mx-auto">
