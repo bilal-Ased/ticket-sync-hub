@@ -45,10 +45,10 @@ const Index = () => {
       <main
         className={cn(
           "transition-all duration-200 p-6 lg:p-8",
-          isSidebarCollapsed ? "ml-16" : "ml-60"
+          isSidebarCollapsed ? "ml-[68px]" : "ml-[240px]"
         )}
       >
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           {renderContent()}
         </div>
       </main>

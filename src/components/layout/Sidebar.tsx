@@ -8,7 +8,8 @@ import {
   Mail, 
   Settings,
   ChevronLeft,
-  LogOut
+  LogOut,
+  Zap
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
@@ -35,25 +36,25 @@ export const Sidebar = ({ activeTab, onTabChange, isCollapsed, onToggleCollapse 
 
   return (
     <motion.aside
-      initial={{ x: -16, opacity: 0 }}
+      initial={{ x: -12, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       className={cn(
-        "fixed left-0 top-0 h-screen bg-sidebar z-50 flex flex-col transition-all duration-200",
-        isCollapsed ? "w-16" : "w-60"
+        "fixed left-0 top-0 h-screen bg-sidebar z-50 flex flex-col transition-all duration-200 border-r border-sidebar-border",
+        isCollapsed ? "w-[68px]" : "w-[240px]"
       )}
     >
       {/* Logo */}
-      <div className="flex items-center justify-between h-14 px-4 border-b border-sidebar-border">
+      <div className="flex items-center justify-between h-14 px-4">
         <div className="flex items-center gap-2.5 overflow-hidden">
-          <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center flex-shrink-0">
-            <Building2 className="w-4 h-4 text-primary-foreground" />
+          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center flex-shrink-0">
+            <Zap className="w-4 h-4 text-primary-foreground" />
           </div>
           {!isCollapsed && (
             <motion.span 
-              className="font-semibold text-sidebar-foreground text-sm whitespace-nowrap"
+              className="font-semibold text-sidebar-foreground text-[15px] whitespace-nowrap"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.1 }}
+              transition={{ delay: 0.05 }}
             >
               TicketFlow
             </motion.span>
@@ -61,28 +62,34 @@ export const Sidebar = ({ activeTab, onTabChange, isCollapsed, onToggleCollapse 
         </div>
         <button
           onClick={onToggleCollapse}
-          className="p-1 rounded hover:bg-sidebar-accent transition-colors text-sidebar-muted hover:text-sidebar-foreground flex-shrink-0"
+          className="p-1.5 rounded-md hover:bg-sidebar-accent transition-colors text-sidebar-muted hover:text-sidebar-foreground flex-shrink-0"
         >
           <ChevronLeft className={cn("w-4 h-4 transition-transform duration-200", isCollapsed && "rotate-180")} />
         </button>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 py-3 px-2 space-y-0.5 overflow-y-auto scrollbar-thin">
+      <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto scrollbar-styled">
+        {!isCollapsed && (
+          <p className="text-[11px] font-medium text-sidebar-muted uppercase tracking-wider px-3 mb-2">
+            Menu
+          </p>
+        )}
         {navItems.map((item, index) => (
           <motion.button
             key={item.id}
-            initial={{ opacity: 0, x: -12 }}
+            initial={{ opacity: 0, x: -8 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.03 * index }}
+            transition={{ delay: 0.02 * index }}
             onClick={() => onTabChange(item.id)}
             className={cn(
               "sidebar-link w-full",
-              activeTab === item.id && "active"
+              activeTab === item.id && "active",
+              isCollapsed && "justify-center px-0"
             )}
             title={isCollapsed ? item.label : undefined}
           >
-            <item.icon className="w-4 h-4 flex-shrink-0" />
+            <item.icon className="w-[18px] h-[18px] flex-shrink-0" />
             {!isCollapsed && (
               <span>{item.label}</span>
             )}
@@ -93,18 +100,18 @@ export const Sidebar = ({ activeTab, onTabChange, isCollapsed, onToggleCollapse 
       {/* Footer */}
       <div className="p-3 border-t border-sidebar-border">
         <div className={cn(
-          "flex items-center gap-2.5 mb-2",
-          isCollapsed && "justify-center"
+          "flex items-center gap-2.5 p-2 rounded-lg hover:bg-sidebar-accent/50 transition-colors cursor-pointer",
+          isCollapsed && "justify-center p-2"
         )}>
-          <div className="w-8 h-8 rounded-full bg-sidebar-accent flex items-center justify-center text-sidebar-foreground text-xs font-medium flex-shrink-0">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center text-primary-foreground text-[12px] font-semibold flex-shrink-0">
             {user?.email?.charAt(0).toUpperCase() || 'A'}
           </div>
           {!isCollapsed && (
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-sidebar-foreground truncate">
+              <p className="text-[13px] font-medium text-sidebar-foreground truncate">
                 {user?.email?.split('@')[0] || 'Admin'}
               </p>
-              <p className="text-xs text-sidebar-muted truncate">
+              <p className="text-[11px] text-sidebar-muted truncate">
                 {user?.email || 'admin@company.com'}
               </p>
             </div>
@@ -113,9 +120,9 @@ export const Sidebar = ({ activeTab, onTabChange, isCollapsed, onToggleCollapse 
         {!isCollapsed && (
           <button
             onClick={() => signOut()}
-            className="flex items-center gap-2 w-full px-2 py-1.5 text-xs text-sidebar-muted hover:text-sidebar-foreground hover:bg-sidebar-accent rounded transition-colors"
+            className="flex items-center gap-2 w-full px-3 py-2 mt-1 text-[13px] text-sidebar-muted hover:text-sidebar-foreground hover:bg-sidebar-accent/50 rounded-lg transition-colors"
           >
-            <LogOut className="w-3.5 h-3.5" />
+            <LogOut className="w-4 h-4" />
             <span>Sign out</span>
           </button>
         )}
