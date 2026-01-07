@@ -14,7 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Space Grotesk', 'system-ui', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
       },
       colors: {
@@ -93,17 +93,26 @@ export default {
           from: { opacity: "0", transform: "translateX(-10px)" },
           to: { opacity: "1", transform: "translateX(0)" },
         },
-        "pulse-glow": {
-          "0%, 100%": { boxShadow: "0 0 0 0 hsl(var(--primary) / 0.4)" },
-          "50%": { boxShadow: "0 0 0 8px hsl(var(--primary) / 0)" },
+        "scale-in": {
+          from: { opacity: "0", transform: "scale(0.95)" },
+          to: { opacity: "1", transform: "scale(1)" },
+        },
+        "shimmer": {
+          from: { backgroundPosition: "200% 0" },
+          to: { backgroundPosition: "-200% 0" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "fade-in": "fade-in 0.3s ease-out",
+        "fade-in": "fade-in 0.4s ease-out",
         "slide-in": "slide-in 0.3s ease-out",
-        "pulse-glow": "pulse-glow 2s infinite",
+        "scale-in": "scale-in 0.3s ease-out",
+        "shimmer": "shimmer 3s linear infinite",
+      },
+      backgroundImage: {
+        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
+        "shimmer": "linear-gradient(90deg, transparent 0%, hsl(var(--primary) / 0.1) 50%, transparent 100%)",
       },
     },
   },
