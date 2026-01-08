@@ -7,6 +7,8 @@ export interface Company {
   api_key: string;
   api_url: string;
   is_active: boolean;
+  webhook_secret?: string;
+  email_recipients?: string[];
 }
 
 export interface Ticket {
