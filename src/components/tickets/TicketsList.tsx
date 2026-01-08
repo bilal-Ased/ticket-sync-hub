@@ -49,6 +49,8 @@ export const TicketsList = () => {
 
   const { data: companies } = useCompanies();
   
+  const companyMap = companies?.reduce((acc, c) => ({ ...acc, [c.id]: c.name }), {} as Record<number, string>) ?? {};
+  
   const { data: tickets, isLoading, refetch } = useTickets({
     company_id: companyFilter ? parseInt(companyFilter) : undefined,
     status: statusFilter || undefined,
@@ -163,6 +165,7 @@ export const TicketsList = () => {
             <thead>
               <tr className="border-b border-border bg-muted/30">
                 <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Ticket #</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Company</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Category</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Status</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Priority</th>
@@ -176,14 +179,14 @@ export const TicketsList = () => {
               {isLoading ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <tr key={i} className="border-b border-border">
-                    <td colSpan={8} className="px-4 py-3">
+                    <td colSpan={9} className="px-4 py-3">
                       <Skeleton className="h-6 w-full" />
                     </td>
                   </tr>
                 ))
               ) : tickets?.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-4 py-12 text-center text-muted-foreground">
+                  <td colSpan={9} className="px-4 py-12 text-center text-muted-foreground">
                     No tickets found
                   </td>
                 </tr>
@@ -199,6 +202,7 @@ export const TicketsList = () => {
                     <td className="px-4 py-3">
                       <span className="font-mono text-sm font-medium text-foreground">{ticket.ticket_number}</span>
                     </td>
+                    <td className="px-4 py-3 text-sm text-foreground">{companyMap[ticket.company_id] || `Company #${ticket.company_id}`}</td>
                     <td className="px-4 py-3 text-sm text-muted-foreground">{ticket.category || "N/A"}</td>
                     <td className="px-4 py-3">
                       <Badge variant="outline" className={cn("badge-status", statusColors[ticket.status] || statusColors["Open"])}>
