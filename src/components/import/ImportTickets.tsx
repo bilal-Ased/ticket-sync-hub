@@ -20,20 +20,61 @@ import {
   Loader2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useCompanies, useImportTickets } from "@/hooks/useApi";
 
-type ImportStatus = "idle" | "importing" | "success" | "error";
+interface ImportHistory {
+  company: string;
+  count: number;
+  time: string;
+  status: "success" | "error";
+}
 
 export const ImportTickets = () => {
-  const [status, setStatus] = useState<ImportStatus>("idle");
   const [selectedCompany, setSelectedCompany] = useState("");
+  const [dateStart, setDateStart] = useState("");
+  const [dateEnd, setDateEnd] = useState("");
+  const [importHistory, setImportHistory] = useState<ImportHistory[]>([]);
 
-  const handleImport = () => {
-    if (!selectedCompany) return;
-    setStatus("importing");
-    setTimeout(() => {
-      setStatus("success");
-    }, 3000);
+  const { data: companies, isLoading: companiesLoading } = useCompanies();
+  const importMutation = useImportTickets();
+
+  const handleImport = async () => {
+    if (!selectedCompany || !dateStart) return;
+    
+    const company = companies?.find(c => c.id.toString() === selectedCompany);
+    
+    try {
+      const result = await importMutation.mutateAsync({
+        company_id: parseInt(selectedCompany),
+        date_start: dateStart,
+        date_end: dateEnd || undefined,
+      });
+
+      setImportHistory(prev => [
+        {
+          company: company?.name || "Unknown",
+          count: result.tickets_imported,
+          time: "Just now",
+          status: "success",
+        },
+        ...prev.slice(0, 4),
+      ]);
+    } catch {
+      setImportHistory(prev => [
+        {
+          company: company?.name || "Unknown",
+          count: 0,
+          time: "Just now",
+          status: "error",
+        },
+        ...prev.slice(0, 4),
+      ]);
+    }
   };
+
+  const status = importMutation.isPending ? "importing" : 
+                 importMutation.isSuccess ? "success" : 
+                 importMutation.isError ? "error" : "idle";
 
   return (
     <div className="space-y-6">
@@ -64,34 +105,43 @@ export const ImportTickets = () => {
               <Label>Company</Label>
               <Select value={selectedCompany} onValueChange={setSelectedCompany}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select a company" />
+                  <SelectValue placeholder={companiesLoading ? "Loading..." : "Select a company"} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="acme">Acme Corp</SelectItem>
-                  <SelectItem value="techstart">TechStart Inc</SelectItem>
-                  <SelectItem value="globaltech">GlobalTech</SelectItem>
-                  <SelectItem value="beta">Beta Corp</SelectItem>
+                  {companies?.map((company) => (
+                    <SelectItem key={company.id} value={company.id.toString()}>
+                      {company.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Start Date</Label>
-                <Input type="date" />
+                <Label>Start Date *</Label>
+                <Input 
+                  type="date" 
+                  value={dateStart}
+                  onChange={(e) => setDateStart(e.target.value)}
+                />
               </div>
               <div className="space-y-2">
                 <Label>End Date</Label>
-                <Input type="date" />
+                <Input 
+                  type="date" 
+                  value={dateEnd}
+                  onChange={(e) => setDateEnd(e.target.value)}
+                />
               </div>
             </div>
 
             <Button 
               className="w-full gap-2" 
               onClick={handleImport}
-              disabled={status === "importing" || !selectedCompany}
+              disabled={importMutation.isPending || !selectedCompany || !dateStart}
             >
-              {status === "importing" ? (
+              {importMutation.isPending ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
                   Importing...
@@ -137,8 +187,8 @@ export const ImportTickets = () => {
                 <p className="text-sm text-muted-foreground">
                   {status === "idle" && "Select a company and date range to begin"}
                   {status === "importing" && "Fetching data from external API..."}
-                  {status === "success" && "245 tickets imported successfully"}
-                  {status === "error" && "Connection timeout. Please try again."}
+                  {status === "success" && importMutation.data && `${importMutation.data.tickets_imported} tickets imported in ${importMutation.data.processing_time}s`}
+                  {status === "error" && (importMutation.error?.message || "Connection error. Please try again.")}
                 </p>
               </div>
             </div>
@@ -147,26 +197,26 @@ export const ImportTickets = () => {
           {/* Recent Imports */}
           <h4 className="text-sm font-medium text-foreground mb-3">Recent Imports</h4>
           <div className="space-y-2">
-            {[
-              { company: "Acme Corp", count: 245, time: "2 hours ago", status: "success" },
-              { company: "TechStart Inc", count: 89, time: "5 hours ago", status: "success" },
-              { company: "GlobalTech", count: 0, time: "1 day ago", status: "error" },
-            ].map((item, index) => (
-              <div key={index} className="flex items-center justify-between py-2 border-b border-border last:border-0">
-                <div className="flex items-center gap-2">
-                  {item.status === "success" ? (
-                    <CheckCircle2 className="w-4 h-4 text-success" />
-                  ) : (
-                    <AlertCircle className="w-4 h-4 text-destructive" />
-                  )}
-                  <span className="text-sm text-foreground">{item.company}</span>
+            {importHistory.length === 0 ? (
+              <p className="text-sm text-muted-foreground py-4 text-center">No recent imports</p>
+            ) : (
+              importHistory.map((item, index) => (
+                <div key={index} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+                  <div className="flex items-center gap-2">
+                    {item.status === "success" ? (
+                      <CheckCircle2 className="w-4 h-4 text-success" />
+                    ) : (
+                      <AlertCircle className="w-4 h-4 text-destructive" />
+                    )}
+                    <span className="text-sm text-foreground">{item.company}</span>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-medium text-foreground">{item.count} tickets</p>
+                    <p className="text-xs text-muted-foreground">{item.time}</p>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm font-medium text-foreground">{item.count} tickets</p>
-                  <p className="text-xs text-muted-foreground">{item.time}</p>
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </motion.div>
       </div>
