@@ -17,10 +17,14 @@ import {
   CheckCircle2, 
   Clock,
   AlertCircle,
-  Loader2
+  Loader2,
+  Sparkles,
+  Calendar,
+  Building2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCompanies, useImportTickets } from "@/hooks/useApi";
+import { Badge } from "@/components/ui/badge";
 
 interface ImportHistory {
   company: string;
@@ -88,23 +92,26 @@ export const ImportTickets = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-card rounded-xl border border-border p-6"
+          className="card-elevated p-6"
         >
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-              <Download className="w-5 h-5 text-primary" />
+          <div className="flex items-center gap-4 mb-8">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+              <Download className="w-6 h-6 text-primary" />
             </div>
             <div>
-              <h3 className="font-semibold text-foreground">Manual Import</h3>
+              <h3 className="text-lg font-semibold text-foreground">Manual Import</h3>
               <p className="text-sm text-muted-foreground">Import tickets on demand</p>
             </div>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-5">
             <div className="space-y-2">
-              <Label>Company</Label>
+              <Label className="flex items-center gap-2 text-sm font-medium">
+                <Building2 className="w-4 h-4 text-muted-foreground" />
+                Company
+              </Label>
               <Select value={selectedCompany} onValueChange={setSelectedCompany}>
-                <SelectTrigger>
+                <SelectTrigger className="h-12 rounded-xl border-border/50">
                   <SelectValue placeholder={companiesLoading ? "Loading..." : "Select a company"} />
                 </SelectTrigger>
                 <SelectContent>
@@ -119,36 +126,44 @@ export const ImportTickets = () => {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Start Date *</Label>
+                <Label className="flex items-center gap-2 text-sm font-medium">
+                  <Calendar className="w-4 h-4 text-muted-foreground" />
+                  Start Date <span className="text-destructive">*</span>
+                </Label>
                 <Input 
                   type="date" 
                   value={dateStart}
                   onChange={(e) => setDateStart(e.target.value)}
+                  className="h-12 rounded-xl border-border/50"
                 />
               </div>
               <div className="space-y-2">
-                <Label>End Date</Label>
+                <Label className="flex items-center gap-2 text-sm font-medium">
+                  <Calendar className="w-4 h-4 text-muted-foreground" />
+                  End Date
+                </Label>
                 <Input 
                   type="date" 
                   value={dateEnd}
                   onChange={(e) => setDateEnd(e.target.value)}
+                  className="h-12 rounded-xl border-border/50"
                 />
               </div>
             </div>
 
             <Button 
-              className="w-full gap-2" 
+              className="w-full h-12 gap-2 rounded-xl text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-200" 
               onClick={handleImport}
               disabled={importMutation.isPending || !selectedCompany || !dateStart}
             >
               {importMutation.isPending ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Importing...
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Importing tickets...
                 </>
               ) : (
                 <>
-                  <Upload className="w-4 h-4" />
+                  <Upload className="w-5 h-5" />
                   Start Import
                 </>
               )}
@@ -161,30 +176,46 @@ export const ImportTickets = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-card rounded-xl border border-border p-6"
+          className="card-elevated p-6"
         >
-          <h3 className="font-semibold text-foreground mb-6">Import Status</h3>
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-success/20 to-success/5 flex items-center justify-center">
+              <Sparkles className="w-6 h-6 text-success" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-foreground">Import Status</h3>
+              <p className="text-sm text-muted-foreground">Track your import progress</p>
+            </div>
+          </div>
           
           <div className={cn(
-            "rounded-lg p-4 mb-4 transition-colors",
-            status === "idle" && "bg-muted",
-            status === "importing" && "bg-primary/10",
-            status === "success" && "bg-success/10",
-            status === "error" && "bg-destructive/10"
+            "rounded-xl p-5 mb-6 transition-all duration-300 border",
+            status === "idle" && "bg-muted/50 border-border",
+            status === "importing" && "bg-primary/5 border-primary/20",
+            status === "success" && "bg-success/5 border-success/20",
+            status === "error" && "bg-destructive/5 border-destructive/20"
           )}>
-            <div className="flex items-center gap-3">
-              {status === "idle" && <Clock className="w-5 h-5 text-muted-foreground" />}
-              {status === "importing" && <Loader2 className="w-5 h-5 text-primary animate-spin" />}
-              {status === "success" && <CheckCircle2 className="w-5 h-5 text-success" />}
-              {status === "error" && <AlertCircle className="w-5 h-5 text-destructive" />}
-              <div>
-                <p className="font-medium text-foreground">
+            <div className="flex items-start gap-4">
+              <div className={cn(
+                "w-10 h-10 rounded-xl flex items-center justify-center",
+                status === "idle" && "bg-muted text-muted-foreground",
+                status === "importing" && "bg-primary/10 text-primary",
+                status === "success" && "bg-success/10 text-success",
+                status === "error" && "bg-destructive/10 text-destructive"
+              )}>
+                {status === "idle" && <Clock className="w-5 h-5" />}
+                {status === "importing" && <Loader2 className="w-5 h-5 animate-spin" />}
+                {status === "success" && <CheckCircle2 className="w-5 h-5" />}
+                {status === "error" && <AlertCircle className="w-5 h-5" />}
+              </div>
+              <div className="flex-1">
+                <p className="font-semibold text-foreground">
                   {status === "idle" && "Ready to import"}
                   {status === "importing" && "Importing tickets..."}
-                  {status === "success" && "Import completed"}
+                  {status === "success" && "Import completed!"}
                   {status === "error" && "Import failed"}
                 </p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground mt-1">
                   {status === "idle" && "Select a company and date range to begin"}
                   {status === "importing" && "Fetching data from external API..."}
                   {status === "success" && importMutation.data && `${importMutation.data.tickets_imported} tickets imported in ${importMutation.data.processing_time}s`}
@@ -195,28 +226,47 @@ export const ImportTickets = () => {
           </div>
 
           {/* Recent Imports */}
-          <h4 className="text-sm font-medium text-foreground mb-3">Recent Imports</h4>
-          <div className="space-y-2">
-            {importHistory.length === 0 ? (
-              <p className="text-sm text-muted-foreground py-4 text-center">No recent imports</p>
-            ) : (
-              importHistory.map((item, index) => (
-                <div key={index} className="flex items-center justify-between py-2 border-b border-border last:border-0">
-                  <div className="flex items-center gap-2">
-                    {item.status === "success" ? (
-                      <CheckCircle2 className="w-4 h-4 text-success" />
-                    ) : (
-                      <AlertCircle className="w-4 h-4 text-destructive" />
-                    )}
-                    <span className="text-sm text-foreground">{item.company}</span>
+          <div>
+            <h4 className="text-sm font-semibold text-foreground mb-4">Recent Imports</h4>
+            <div className="space-y-3">
+              {importHistory.length === 0 ? (
+                <div className="py-8 text-center">
+                  <div className="w-12 h-12 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-3">
+                    <Clock className="w-6 h-6 text-muted-foreground" />
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm font-medium text-foreground">{item.count} tickets</p>
-                    <p className="text-xs text-muted-foreground">{item.time}</p>
-                  </div>
+                  <p className="text-sm text-muted-foreground">No recent imports</p>
                 </div>
-              ))
-            )}
+              ) : (
+                importHistory.map((item, index) => (
+                  <motion.div 
+                    key={index} 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.05 * index }}
+                    className="flex items-center justify-between p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      {item.status === "success" ? (
+                        <div className="w-8 h-8 rounded-lg bg-success/10 flex items-center justify-center">
+                          <CheckCircle2 className="w-4 h-4 text-success" />
+                        </div>
+                      ) : (
+                        <div className="w-8 h-8 rounded-lg bg-destructive/10 flex items-center justify-center">
+                          <AlertCircle className="w-4 h-4 text-destructive" />
+                        </div>
+                      )}
+                      <div>
+                        <p className="text-sm font-medium text-foreground">{item.company}</p>
+                        <p className="text-xs text-muted-foreground">{item.time}</p>
+                      </div>
+                    </div>
+                    <Badge variant={item.status === "success" ? "default" : "destructive"} className="rounded-lg">
+                      {item.count} tickets
+                    </Badge>
+                  </motion.div>
+                ))
+              )}
+            </div>
           </div>
         </motion.div>
       </div>
