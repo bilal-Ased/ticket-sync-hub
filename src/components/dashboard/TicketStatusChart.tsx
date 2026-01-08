@@ -1,14 +1,55 @@
 import { motion } from "framer-motion";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
+import { useTicketStats } from "@/hooks/useApi";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const data = [
-  { name: "Open", value: 45, color: "#3B82F6" },
-  { name: "In Progress", value: 30, color: "#F59E0B" },
-  { name: "Resolved", value: 85, color: "#10B981" },
-  { name: "Closed", value: 120, color: "#6B7280" },
-];
+const COLORS = ["#3B82F6", "#F59E0B", "#10B981", "#6B7280", "#EF4444"];
 
 export const TicketStatusChart = () => {
+  const { data: stats, isLoading, error } = useTicketStats();
+
+  const chartData = stats?.by_status 
+    ? Object.entries(stats.by_status).map(([name, value], index) => ({ 
+        name, 
+        value,
+        color: COLORS[index % COLORS.length]
+      }))
+    : [];
+
+  if (isLoading) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15 }}
+        className="card-soft p-5"
+      >
+        <h3 className="text-[15px] font-semibold text-foreground mb-1">Tickets by Status</h3>
+        <p className="text-[13px] text-muted-foreground mb-4">Distribution of current tickets</p>
+        <div className="h-52 flex items-center justify-center">
+          <Skeleton className="w-32 h-32 rounded-full" />
+        </div>
+      </motion.div>
+    );
+  }
+
+  if (error || chartData.length === 0) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15 }}
+        className="card-soft p-5"
+      >
+        <h3 className="text-[15px] font-semibold text-foreground mb-1">Tickets by Status</h3>
+        <p className="text-[13px] text-muted-foreground mb-4">Distribution of current tickets</p>
+        <div className="h-52 flex items-center justify-center text-muted-foreground text-sm">
+          {error ? "Failed to load data" : "No ticket data available"}
+        </div>
+      </motion.div>
+    );
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -22,7 +63,7 @@ export const TicketStatusChart = () => {
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
-              data={data}
+              data={chartData}
               cx="50%"
               cy="50%"
               innerRadius={45}
@@ -31,7 +72,7 @@ export const TicketStatusChart = () => {
               dataKey="value"
               strokeWidth={0}
             >
-              {data.map((entry, index) => (
+              {chartData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
             </Pie>

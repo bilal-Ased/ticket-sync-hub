@@ -1,5 +1,5 @@
 // FastAPI Backend Integration
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = 'https://suety-hyperidealistically-crystle.ngrok-free.dev';
 
 export interface Company {
   id: number;
@@ -55,6 +55,7 @@ class ApiClient {
       ...options,
       headers: {
         'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true',
         ...options.headers,
       },
     });
@@ -79,6 +80,10 @@ class ApiClient {
     });
   }
 
+  async getCompany(id: number): Promise<Company> {
+    return this.request<Company>(`/companies/${id}`);
+  }
+
   async deleteCompany(id: number): Promise<void> {
     return this.request(`/companies/${id}`, { method: 'DELETE' });
   }
@@ -88,6 +93,8 @@ class ApiClient {
     company_id?: number;
     status?: string;
     category?: string;
+    created_by?: string;
+    assigned_to?: string;
     date_start?: string;
     date_end?: string;
     search?: string;
