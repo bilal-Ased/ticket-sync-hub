@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Dashboard } from "@/components/dashboard/Dashboard";
 import { TicketsList } from "@/components/tickets/TicketsList";
@@ -36,22 +37,28 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Gradient background overlay */}
+      <div className="fixed inset-0 gradient-bg pointer-events-none" />
+      
       <Sidebar
         activeTab={activeTab}
         onTabChange={setActiveTab}
         isCollapsed={isSidebarCollapsed}
         onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
       />
-      <main
+      <motion.main
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
         className={cn(
-          "transition-all duration-200 p-6 lg:p-8",
-          isSidebarCollapsed ? "ml-[68px]" : "ml-[240px]"
+          "relative transition-all duration-300 p-6 lg:p-8",
+          isSidebarCollapsed ? "ml-[72px]" : "ml-[260px]"
         )}
       >
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           {renderContent()}
         </div>
-      </main>
+      </motion.main>
     </div>
   );
 };
