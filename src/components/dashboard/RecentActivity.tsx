@@ -10,7 +10,7 @@ const activities = [
     message: "Imported 245 tickets from Acme Corp",
     time: "2 min ago",
     icon: Ticket,
-    iconBg: "bg-primary/10 text-primary",
+    color: "text-primary bg-primary/10",
   },
   {
     id: 2,
@@ -18,7 +18,7 @@ const activities = [
     message: "New company added: TechStart Inc",
     time: "15 min ago",
     icon: Building2,
-    iconBg: "bg-success/10 text-success",
+    color: "text-success bg-success/10",
   },
   {
     id: 3,
@@ -26,7 +26,7 @@ const activities = [
     message: "Scheduled import completed for GlobalTech",
     time: "1 hour ago",
     icon: Clock,
-    iconBg: "bg-warning/10 text-warning",
+    color: "text-warning bg-warning/10",
   },
   {
     id: 4,
@@ -34,7 +34,7 @@ const activities = [
     message: "12 tickets marked as resolved",
     time: "2 hours ago",
     icon: CheckCircle2,
-    iconBg: "bg-success/10 text-success",
+    color: "text-success bg-success/10",
   },
   {
     id: 5,
@@ -42,28 +42,29 @@ const activities = [
     message: "Weekly report sent to stakeholders",
     time: "3 hours ago",
     icon: Mail,
-    iconBg: "bg-muted text-muted-foreground",
+    color: "text-info bg-info/10",
   },
 ];
 
 export const RecentActivity = () => {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.2, duration: 0.3 }}
-      className="card-elevated p-6"
+      transition={{ delay: 0.2 }}
+      className="card-surface p-6"
     >
       <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="text-lg font-semibold text-foreground">Recent Activity</h3>
-          <p className="text-sm text-muted-foreground mt-0.5">Latest updates from your team</p>
+          <p className="text-sm text-muted-foreground">Latest updates from your team</p>
         </div>
-        <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80 gap-1.5">
+        <Button variant="ghost" size="sm" className="gap-1.5 text-primary">
           View all
           <ArrowRight className="w-4 h-4" />
         </Button>
       </div>
+      
       <div className="space-y-1">
         {activities.map((activity, index) => (
           <motion.div
@@ -71,17 +72,17 @@ export const RecentActivity = () => {
             initial={{ opacity: 0, x: -8 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.05 * index }}
-            className="flex items-start gap-3.5 p-3 rounded-xl hover:bg-accent/50 transition-colors -mx-3 cursor-pointer group"
+            className="flex items-start gap-3 p-3 -mx-3 rounded-xl hover:bg-accent/50 transition-colors cursor-pointer"
           >
             <div className={cn(
-              "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:scale-110",
-              activity.iconBg
+              "w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0",
+              activity.color
             )}>
-              <activity.icon className="w-5 h-5" />
+              <activity.icon className="w-4 h-4" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm text-foreground leading-relaxed font-medium">{activity.message}</p>
-              <p className="text-xs text-muted-foreground mt-1">{activity.time}</p>
+              <p className="text-sm text-foreground">{activity.message}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{activity.time}</p>
             </div>
           </motion.div>
         ))}

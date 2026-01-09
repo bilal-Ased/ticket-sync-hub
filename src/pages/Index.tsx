@@ -8,7 +8,6 @@ import { ImportTickets } from "@/components/import/ImportTickets";
 import { CronJobs } from "@/components/cron/CronJobs";
 import { EmailSettings } from "@/components/email/EmailSettings";
 import { SettingsPage } from "@/components/settings/SettingsPage";
-import { cn } from "@/lib/utils";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -37,23 +36,20 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Gradient background overlay */}
-      <div className="fixed inset-0 gradient-bg pointer-events-none" />
-      
       <Sidebar
         activeTab={activeTab}
         onTabChange={setActiveTab}
         isCollapsed={isSidebarCollapsed}
         onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
       />
+      
       <motion.main
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.3 }}
-        className={cn(
-          "relative transition-all duration-300 p-6 lg:p-8",
-          isSidebarCollapsed ? "ml-[72px]" : "ml-[260px]"
-        )}
+        initial={false}
+        animate={{ 
+          marginLeft: isSidebarCollapsed ? 80 : 280,
+        }}
+        transition={{ duration: 0.2, ease: "easeInOut" }}
+        className="min-h-screen p-6 lg:p-8"
       >
         <div className="max-w-7xl mx-auto">
           {renderContent()}

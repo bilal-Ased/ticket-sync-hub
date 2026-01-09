@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { LucideIcon, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { LucideIcon, TrendingUp, TrendingDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface StatCardProps {
@@ -9,14 +9,14 @@ interface StatCardProps {
   changeType?: "positive" | "negative" | "neutral";
   icon: LucideIcon;
   delay?: number;
-  iconColor?: string;
+  iconColor?: "primary" | "success" | "warning" | "info";
 }
 
-const iconColors = {
-  primary: "from-primary/20 to-primary/5 text-primary",
-  success: "from-success/20 to-success/5 text-success",
-  warning: "from-warning/20 to-warning/5 text-warning",
-  info: "from-info/20 to-info/5 text-info",
+const colorClasses = {
+  primary: "bg-primary/10 text-primary",
+  success: "bg-success/10 text-success",
+  warning: "bg-warning/10 text-warning",
+  info: "bg-info/10 text-info",
 };
 
 export const StatCard = ({ 
@@ -30,35 +30,36 @@ export const StatCard = ({
 }: StatCardProps) => {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay, duration: 0.3, ease: "easeOut" }}
-      className="stat-card group"
+      transition={{ delay, duration: 0.3 }}
+      className="stat-card"
     >
-      <div className="flex items-start justify-between mb-5">
+      <div className="flex items-center justify-between mb-4">
         <div className={cn(
-          "w-12 h-12 rounded-xl bg-gradient-to-br flex items-center justify-center transition-transform duration-300 group-hover:scale-110",
-          iconColors[iconColor as keyof typeof iconColors] || iconColors.primary
+          "w-11 h-11 rounded-xl flex items-center justify-center",
+          colorClasses[iconColor]
         )}>
-          <Icon className="w-6 h-6" />
+          <Icon className="w-5 h-5" />
         </div>
+        
         {change && (
           <div className={cn(
-            "flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold",
+            "flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium",
             changeType === "positive" && "bg-success/10 text-success",
             changeType === "negative" && "bg-destructive/10 text-destructive",
             changeType === "neutral" && "bg-muted text-muted-foreground"
           )}>
-            {changeType === "positive" && <TrendingUp className="w-3.5 h-3.5" />}
-            {changeType === "negative" && <TrendingDown className="w-3.5 h-3.5" />}
-            {changeType === "neutral" && <Minus className="w-3.5 h-3.5" />}
+            {changeType === "positive" && <TrendingUp className="w-3 h-3" />}
+            {changeType === "negative" && <TrendingDown className="w-3 h-3" />}
             <span>{change}</span>
           </div>
         )}
       </div>
+      
       <div>
-        <p className="text-sm font-medium text-muted-foreground mb-1.5">{title}</p>
-        <p className="text-3xl font-bold text-foreground tracking-tight">{value}</p>
+        <p className="text-sm text-muted-foreground mb-1">{title}</p>
+        <p className="text-3xl font-bold text-foreground">{value}</p>
       </div>
     </motion.div>
   );
