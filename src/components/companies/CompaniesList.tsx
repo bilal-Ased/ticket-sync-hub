@@ -26,10 +26,13 @@ import {
   Globe,
   CheckCircle2,
   XCircle,
-  Loader2
+  Loader2,
+  Wifi,
+  WifiOff
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCompanies, useCreateCompany, useDeleteCompany } from "@/hooks/useApi";
+import { toast } from "sonner";
 
 export const CompaniesList = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -39,10 +42,44 @@ export const CompaniesList = () => {
     api_key: "",
     email_recipients: "" 
   });
+  const [testingConnection, setTestingConnection] = useState<number | null>(null);
 
   const { data: companies, isLoading, refetch } = useCompanies();
   const createMutation = useCreateCompany();
   const deleteMutation = useDeleteCompany();
+
+  const handleTestConnection = async (company: { id: number; api_url: string; api_key: string; name: string }) => {
+    setTestingConnection(company.id);
+    try {
+      const response = await fetch(company.api_url, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${company.api_key}`,
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true',
+        },
+        signal: AbortSignal.timeout(10000),
+      });
+      
+      if (response.ok) {
+        toast.success(`Connection to ${company.name} successful!`);
+      } else {
+        toast.error(`Connection failed: HTTP ${response.status}`);
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.name === 'TimeoutError') {
+          toast.error(`Connection to ${company.name} timed out`);
+        } else {
+          toast.error(`Connection failed: ${error.message}`);
+        }
+      } else {
+        toast.error(`Connection to ${company.name} failed`);
+      }
+    } finally {
+      setTestingConnection(null);
+    }
+  };
 
   const handleCreateCompany = async () => {
     if (!newCompany.name || !newCompany.api_url || !newCompany.api_key) return;
@@ -298,6 +335,25 @@ export const CompaniesList = () => {
               <div className="px-5 py-3 border-t border-border flex items-center justify-between">
                 <span className="text-xs text-muted-foreground font-mono">ID: {company.id}</span>
                 <div className="flex gap-1">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-8 px-2.5"
+                    onClick={() => handleTestConnection(company)}
+                    disabled={testingConnection === company.id}
+                  >
+                    {testingConnection === company.id ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" />
+                        Testing...
+                      </>
+                    ) : (
+                      <>
+                        <Wifi className="w-3.5 h-3.5 mr-1" />
+                        Test
+                      </>
+                    )}
+                  </Button>
                   <Button variant="ghost" size="sm" className="h-8 px-2.5">
                     <Edit className="w-3.5 h-3.5 mr-1" />
                     Edit
