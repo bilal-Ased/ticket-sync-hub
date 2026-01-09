@@ -270,7 +270,7 @@ export const CompaniesList = () => {
                   <div className="min-w-0 flex-1">
                     <p className="text-xs text-muted-foreground">API Key</p>
                     <p className="text-sm text-foreground font-mono">
-                      ••••••••{company.api_key.slice(-8)}
+                      ••••••••{company.api_key?.slice(-8) || '••••••••'}
                     </p>
                   </div>
                 </div>
