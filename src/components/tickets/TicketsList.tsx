@@ -20,18 +20,19 @@ import {
   ChevronLeft,
   ChevronRight,
   Search,
-  Calendar
+  Calendar,
+  X
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTickets, useCompanies } from "@/hooks/useApi";
 import { format } from "date-fns";
 
 const statusStyles: Record<string, string> = {
-  "Open": "bg-primary/10 text-primary border-primary/20",
-  "In Progress": "bg-warning/10 text-warning border-warning/20",
-  "Resolved": "bg-success/10 text-success border-success/20",
-  "Closed": "bg-muted text-muted-foreground border-border",
-  "Pending": "bg-info/10 text-info border-info/20",
+  "Open": "bg-primary/10 text-primary",
+  "In Progress": "bg-warning/10 text-warning",
+  "Resolved": "bg-success/10 text-success",
+  "Closed": "bg-muted text-muted-foreground",
+  "Pending": "bg-info/10 text-info",
 };
 
 const priorityStyles: Record<string, string> = {
@@ -84,7 +85,7 @@ export const TicketsList = () => {
   const hasFilters = companyFilter || statusFilter || categoryFilter || dateStart || dateEnd;
 
   return (
-    <div className="space-y-6">
+    <div className="page-container">
       <Header 
         title="Tickets" 
         subtitle="View and manage all imported tickets"
@@ -96,130 +97,126 @@ export const TicketsList = () => {
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="card-elevated p-5"
+        className="filter-bar"
       >
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-2.5 text-sm text-muted-foreground">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-              <Filter className="w-4 h-4 text-primary" />
-            </div>
-            <span className="font-medium">Filters</span>
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+            <Filter className="w-4 h-4 text-primary" />
           </div>
-          
-          <div className="h-6 w-px bg-border" />
-          
-          <Select value={companyFilter} onValueChange={setCompanyFilter}>
-            <SelectTrigger className="w-44 h-10 rounded-xl border-border/50">
-              <SelectValue placeholder="All Companies" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Companies</SelectItem>
-              {companies?.map((company) => (
-                <SelectItem key={company.id} value={company.id.toString()}>
-                  {company.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-36 h-10 rounded-xl border-border/50">
-              <SelectValue placeholder="All Statuses" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="Open">Open</SelectItem>
-              <SelectItem value="In Progress">In Progress</SelectItem>
-              <SelectItem value="Pending">Pending</SelectItem>
-              <SelectItem value="Resolved">Resolved</SelectItem>
-              <SelectItem value="Closed">Closed</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger className="w-36 h-10 rounded-xl border-border/50">
-              <SelectValue placeholder="All Categories" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
-              <SelectItem value="Technical">Technical</SelectItem>
-              <SelectItem value="Billing">Billing</SelectItem>
-              <SelectItem value="Support">Support</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <div className="flex items-center gap-2">
-            <div className="relative">
-              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-              <Input
-                type="date"
-                className="w-40 h-10 pl-9 rounded-xl border-border/50"
-                value={dateStart}
-                onChange={(e) => setDateStart(e.target.value)}
-              />
-            </div>
-            <span className="text-muted-foreground">to</span>
-            <Input
-              type="date"
-              className="w-40 h-10 rounded-xl border-border/50"
-              value={dateEnd}
-              onChange={(e) => setDateEnd(e.target.value)}
-            />
-          </div>
-
-          <div className="flex-1" />
-
-          {hasFilters && (
-            <Button variant="ghost" size="sm" onClick={clearFilters} className="text-muted-foreground">
-              Clear all
-            </Button>
-          )}
-
-          <Button variant="outline" size="sm" className="gap-2 rounded-xl">
-            <Download className="w-4 h-4" />
-            Export
-          </Button>
+          <span className="font-medium">Filters</span>
         </div>
+        
+        <div className="h-6 w-px bg-border hidden sm:block" />
+        
+        <Select value={companyFilter} onValueChange={setCompanyFilter}>
+          <SelectTrigger className="w-40 h-9 rounded-xl">
+            <SelectValue placeholder="Company" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Companies</SelectItem>
+            {companies?.map((company) => (
+              <SelectItem key={company.id} value={company.id.toString()}>
+                {company.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-32 h-9 rounded-xl">
+            <SelectValue placeholder="Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Statuses</SelectItem>
+            <SelectItem value="Open">Open</SelectItem>
+            <SelectItem value="In Progress">In Progress</SelectItem>
+            <SelectItem value="Pending">Pending</SelectItem>
+            <SelectItem value="Resolved">Resolved</SelectItem>
+            <SelectItem value="Closed">Closed</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+          <SelectTrigger className="w-32 h-9 rounded-xl">
+            <SelectValue placeholder="Category" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Categories</SelectItem>
+            <SelectItem value="Technical">Technical</SelectItem>
+            <SelectItem value="Billing">Billing</SelectItem>
+            <SelectItem value="Support">Support</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <div className="flex items-center gap-2">
+          <Input
+            type="date"
+            className="w-36 h-9 rounded-xl text-sm"
+            value={dateStart}
+            onChange={(e) => setDateStart(e.target.value)}
+          />
+          <span className="text-muted-foreground text-sm">to</span>
+          <Input
+            type="date"
+            className="w-36 h-9 rounded-xl text-sm"
+            value={dateEnd}
+            onChange={(e) => setDateEnd(e.target.value)}
+          />
+        </div>
+
+        <div className="flex-1" />
+
+        {hasFilters && (
+          <Button variant="ghost" size="sm" onClick={clearFilters} className="gap-1.5 text-muted-foreground">
+            <X className="w-3.5 h-3.5" />
+            Clear
+          </Button>
+        )}
+
+        <Button variant="outline" size="sm" className="gap-2 rounded-xl">
+          <Download className="w-4 h-4" />
+          Export
+        </Button>
       </motion.div>
 
-      {/* Tickets Table */}
+      {/* Table */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="card-elevated overflow-hidden"
+        className="card-surface overflow-hidden"
       >
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="data-table">
             <thead>
-              <tr className="border-b border-border bg-muted/30">
-                <th className="text-left px-5 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Ticket #</th>
-                <th className="text-left px-5 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Company</th>
-                <th className="text-left px-5 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Category</th>
-                <th className="text-left px-5 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Status</th>
-                <th className="text-left px-5 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Priority</th>
-                <th className="text-left px-5 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Assigned To</th>
-                <th className="text-left px-5 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Created</th>
-                <th className="text-right px-5 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Actions</th>
+              <tr>
+                <th>Ticket #</th>
+                <th>Company</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Priority</th>
+                <th>Assigned To</th>
+                <th>Created</th>
+                <th className="text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
               {isLoading ? (
                 Array.from({ length: 8 }).map((_, i) => (
-                  <tr key={i} className="border-b border-border">
-                    <td colSpan={8} className="px-5 py-4">
-                      <Skeleton className="h-6 w-full rounded-lg" />
+                  <tr key={i}>
+                    <td colSpan={8}>
+                      <Skeleton className="h-5 w-full" />
                     </td>
                   </tr>
                 ))
               ) : tickets?.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-5 py-16 text-center">
-                    <div className="flex flex-col items-center">
-                      <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mb-4">
-                        <Search className="w-8 h-8 text-muted-foreground" />
+                  <td colSpan={8} className="py-12">
+                    <div className="empty-state">
+                      <div className="empty-state-icon">
+                        <Search className="w-7 h-7 text-muted-foreground" />
                       </div>
-                      <p className="text-muted-foreground font-medium">No tickets found</p>
+                      <p className="font-medium text-foreground">No tickets found</p>
                       <p className="text-sm text-muted-foreground mt-1">Try adjusting your filters</p>
                     </div>
                   </td>
@@ -231,40 +228,40 @@ export const TicketsList = () => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.02 * index }}
-                    className="table-row group"
+                    className="group"
                   >
-                    <td className="px-5 py-4">
-                      <span className="font-mono text-sm font-semibold text-foreground">{ticket.ticket_number}</span>
+                    <td>
+                      <span className="font-mono text-sm font-medium">{ticket.ticket_number}</span>
                     </td>
-                    <td className="px-5 py-4">
-                      <span className="text-sm font-medium text-foreground">{companyMap[ticket.company_id] || `#${ticket.company_id}`}</span>
+                    <td>
+                      <span className="font-medium">{companyMap[ticket.company_id] || `#${ticket.company_id}`}</span>
                     </td>
-                    <td className="px-5 py-4">
-                      <span className="text-sm text-muted-foreground">{ticket.category || "—"}</span>
+                    <td>
+                      <span className="text-muted-foreground">{ticket.category || "—"}</span>
                     </td>
-                    <td className="px-5 py-4">
-                      <Badge variant="outline" className={cn(
-                        "text-xs font-semibold rounded-lg border",
+                    <td>
+                      <Badge className={cn(
+                        "status-badge",
                         statusStyles[ticket.status] || statusStyles["Open"]
                       )}>
                         {ticket.status || "Unknown"}
                       </Badge>
                     </td>
-                    <td className="px-5 py-4">
-                      <span className={cn(
-                        "badge-status text-xs font-semibold rounded-lg",
-                        priorityStyles[ticket.priority || "Medium"] || priorityStyles["Medium"]
+                    <td>
+                      <Badge variant="outline" className={cn(
+                        "status-badge",
+                        priorityStyles[ticket.priority || "Medium"]
                       )}>
                         {ticket.priority || "Medium"}
-                      </span>
+                      </Badge>
                     </td>
-                    <td className="px-5 py-4">
-                      <span className="text-sm text-muted-foreground">{ticket.assigned_to || "Unassigned"}</span>
+                    <td>
+                      <span className="text-muted-foreground">{ticket.assigned_to || "Unassigned"}</span>
                     </td>
-                    <td className="px-5 py-4">
-                      <span className="text-sm text-muted-foreground">{formatDate(ticket.created_date_ts)}</span>
+                    <td>
+                      <span className="text-muted-foreground">{formatDate(ticket.created_date_ts)}</span>
                     </td>
-                    <td className="px-5 py-4">
+                    <td>
                       <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg">
                           <Eye className="w-4 h-4" />
@@ -282,11 +279,11 @@ export const TicketsList = () => {
         </div>
 
         {/* Pagination */}
-        <div className="flex items-center justify-between px-5 py-4 border-t border-border bg-muted/20">
+        <div className="flex items-center justify-between px-4 py-4 border-t border-border">
           <p className="text-sm text-muted-foreground">
-            Showing <span className="font-semibold text-foreground">{tickets?.length || 0}</span> tickets
+            Showing <span className="font-medium text-foreground">{tickets?.length || 0}</span> tickets
           </p>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <Button 
               variant="outline" 
               size="sm" 
@@ -297,11 +294,9 @@ export const TicketsList = () => {
               <ChevronLeft className="w-4 h-4" />
               Previous
             </Button>
-            <div className="flex items-center gap-1">
-              <span className="text-sm font-medium text-foreground px-3 py-1 rounded-lg bg-primary/10">
-                {page + 1}
-              </span>
-            </div>
+            <span className="text-sm font-medium px-3 py-1.5 rounded-lg bg-muted">
+              {page + 1}
+            </span>
             <Button 
               variant="outline" 
               size="sm"

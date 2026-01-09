@@ -15,7 +15,7 @@ export const Dashboard = () => {
   const categoriesCount = stats?.by_category ? Object.keys(stats.by_category).length : 0;
 
   return (
-    <div className="space-y-8">
+    <div className="page-container">
       <Header 
         title="Dashboard" 
         subtitle="Overview of your ticket management system"
@@ -23,11 +23,11 @@ export const Dashboard = () => {
         isRefreshing={isFetching}
       />
 
-      {/* Stats Grid */}
-      <div className="feature-grid">
+      {/* Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="Total Tickets"
-          value={statsLoading ? "..." : totalTickets.toLocaleString()}
+          value={statsLoading ? "—" : totalTickets.toLocaleString()}
           change="+12.5%"
           changeType="positive"
           icon={Ticket}
@@ -36,7 +36,7 @@ export const Dashboard = () => {
         />
         <StatCard
           title="Active Companies"
-          value={companiesLoading ? "..." : activeCompanies.toString()}
+          value={companiesLoading ? "—" : activeCompanies.toString()}
           change={`${activeCompanies} connected`}
           changeType="positive"
           icon={Building2}
@@ -63,7 +63,7 @@ export const Dashboard = () => {
         />
       </div>
 
-      {/* Charts & Activity */}
+      {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <TicketStatusChart />
         <RecentActivity />
