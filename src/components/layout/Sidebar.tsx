@@ -37,35 +37,33 @@ export const Sidebar = ({ activeTab, onTabChange, isCollapsed, onToggleCollapse 
   return (
     <motion.aside
       initial={false}
-      animate={{ width: isCollapsed ? 80 : 280 }}
+      animate={{ width: isCollapsed ? 72 : 260 }}
       transition={{ duration: 0.2, ease: "easeInOut" }}
-      className="fixed left-0 top-0 h-screen bg-sidebar z-50 flex flex-col border-r border-sidebar-border"
+      className="fixed left-0 top-0 h-screen bg-sidebar flex flex-col border-r border-sidebar-border z-50"
     >
       {/* Header */}
       <div className="h-16 flex items-center justify-between px-4 border-b border-sidebar-border">
         <div className="flex items-center gap-3 overflow-hidden">
-          <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center flex-shrink-0 glow-primary">
+          <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center flex-shrink-0 shadow-md">
             <Zap className="w-5 h-5 text-primary-foreground" />
           </div>
           <AnimatePresence>
             {!isCollapsed && (
-              <motion.div
+              <motion.span
                 initial={{ opacity: 0, width: 0 }}
                 animate={{ opacity: 1, width: "auto" }}
                 exit={{ opacity: 0, width: 0 }}
                 transition={{ duration: 0.15 }}
-                className="overflow-hidden"
+                className="font-semibold text-sidebar-foreground text-base whitespace-nowrap overflow-hidden"
               >
-                <h1 className="font-bold text-sidebar-foreground text-lg whitespace-nowrap">
-                  TicketFlow
-                </h1>
-              </motion.div>
+                TicketFlow
+              </motion.span>
             )}
           </AnimatePresence>
         </div>
         <button
           onClick={onToggleCollapse}
-          className="icon-btn flex-shrink-0"
+          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-sidebar-accent text-sidebar-muted hover:text-sidebar-foreground transition-colors flex-shrink-0"
         >
           <ChevronLeft className={cn(
             "w-4 h-4 transition-transform duration-200",
@@ -82,51 +80,56 @@ export const Sidebar = ({ activeTab, onTabChange, isCollapsed, onToggleCollapse 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="text-[11px] font-semibold text-sidebar-muted uppercase tracking-widest px-4 mb-3"
+              className="text-[11px] font-medium text-sidebar-muted uppercase tracking-wider px-3 mb-2"
             >
-              Menu
+              Navigation
             </motion.p>
           )}
         </AnimatePresence>
         
         <div className="space-y-1">
-          {navItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => onTabChange(item.id)}
-              className={cn(
-                "nav-item w-full",
-                activeTab === item.id && "active",
-                isCollapsed && "justify-center px-0"
-              )}
-              title={isCollapsed ? item.label : undefined}
-            >
-              <item.icon className="w-5 h-5 flex-shrink-0" />
-              <AnimatePresence>
-                {!isCollapsed && (
-                  <motion.span
-                    initial={{ opacity: 0, width: 0 }}
-                    animate={{ opacity: 1, width: "auto" }}
-                    exit={{ opacity: 0, width: 0 }}
-                    transition={{ duration: 0.15 }}
-                    className="whitespace-nowrap overflow-hidden"
-                  >
-                    {item.label}
-                  </motion.span>
+          {navItems.map((item) => {
+            const isActive = activeTab === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => onTabChange(item.id)}
+                className={cn(
+                  "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150",
+                  isActive
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-sidebar-muted hover:text-sidebar-foreground hover:bg-sidebar-accent",
+                  isCollapsed && "justify-center px-2"
                 )}
-              </AnimatePresence>
-            </button>
-          ))}
+                title={isCollapsed ? item.label : undefined}
+              >
+                <item.icon className="w-5 h-5 flex-shrink-0" />
+                <AnimatePresence>
+                  {!isCollapsed && (
+                    <motion.span
+                      initial={{ opacity: 0, width: 0 }}
+                      animate={{ opacity: 1, width: "auto" }}
+                      exit={{ opacity: 0, width: 0 }}
+                      transition={{ duration: 0.15 }}
+                      className="whitespace-nowrap overflow-hidden"
+                    >
+                      {item.label}
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </button>
+            );
+          })}
         </div>
       </nav>
 
       {/* User section */}
       <div className="p-3 border-t border-sidebar-border">
         <div className={cn(
-          "flex items-center gap-3 p-3 rounded-xl bg-sidebar-accent",
+          "flex items-center gap-3 p-3 rounded-lg bg-sidebar-accent",
           isCollapsed && "justify-center p-2"
         )}>
-          <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center text-primary-foreground text-sm font-bold flex-shrink-0">
+          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary text-sm font-semibold flex-shrink-0">
             {user?.email?.charAt(0).toUpperCase() || 'U'}
           </div>
           <AnimatePresence>
@@ -156,7 +159,7 @@ export const Sidebar = ({ activeTab, onTabChange, isCollapsed, onToggleCollapse 
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               onClick={() => signOut()}
-              className="flex items-center gap-2 w-full px-4 py-2.5 mt-2 text-sm text-sidebar-muted hover:text-sidebar-foreground hover:bg-sidebar-accent rounded-xl transition-colors"
+              className="flex items-center gap-2 w-full px-3 py-2.5 mt-2 text-sm text-sidebar-muted hover:text-sidebar-foreground hover:bg-sidebar-accent rounded-lg transition-colors"
             >
               <LogOut className="w-4 h-4" />
               <span>Sign out</span>

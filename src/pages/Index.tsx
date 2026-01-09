@@ -46,7 +46,7 @@ const Index = () => {
       <motion.main
         initial={false}
         animate={{ 
-          marginLeft: isSidebarCollapsed ? 80 : 280,
+          marginLeft: isSidebarCollapsed ? 72 : 260,
         }}
         transition={{ duration: 0.2, ease: "easeInOut" }}
         className="min-h-screen p-6 lg:p-8"
