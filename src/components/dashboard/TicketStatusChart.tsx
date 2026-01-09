@@ -22,7 +22,7 @@ export const TicketStatusChart = () => {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.15 }}
-        className="card-soft p-5"
+        className="card-surface p-5"
       >
         <h3 className="text-[15px] font-semibold text-foreground mb-1">Tickets by Status</h3>
         <p className="text-[13px] text-muted-foreground mb-4">Distribution of current tickets</p>
@@ -33,13 +33,13 @@ export const TicketStatusChart = () => {
     );
   }
 
-  if (error || chartData.length === 0) {
+  if (error || !chartData || chartData.length === 0) {
     return (
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.15 }}
-        className="card-soft p-5"
+        className="card-surface p-5"
       >
         <h3 className="text-[15px] font-semibold text-foreground mb-1">Tickets by Status</h3>
         <p className="text-[13px] text-muted-foreground mb-4">Distribution of current tickets</p>
@@ -55,7 +55,7 @@ export const TicketStatusChart = () => {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.15 }}
-      className="card-soft p-5"
+      className="card-surface p-5"
     >
       <h3 className="text-[15px] font-semibold text-foreground mb-1">Tickets by Status</h3>
       <p className="text-[13px] text-muted-foreground mb-4">Distribution of current tickets</p>
@@ -88,6 +88,11 @@ export const TicketStatusChart = () => {
             <Legend 
               verticalAlign="bottom" 
               height={28}
+              payload={chartData.map((item) => ({
+                value: item.name,
+                type: 'circle',
+                color: item.color,
+              }))}
               formatter={(value) => <span className="text-[12px] text-foreground">{value}</span>}
             />
           </PieChart>
