@@ -4,6 +4,7 @@ import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { 
   Select,
   SelectContent,
@@ -20,7 +21,9 @@ import {
   Loader2,
   Sparkles,
   Calendar,
-  Building2
+  Building2,
+  Mail,
+  Send
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCompanies, useImportTickets } from "@/hooks/useApi";
@@ -37,26 +40,35 @@ export const ImportTickets = () => {
   const [selectedCompany, setSelectedCompany] = useState("");
   const [dateStart, setDateStart] = useState("");
   const [dateEnd, setDateEnd] = useState("");
+  const [sendEmail, setSendEmail] = useState(false);
+  const [recipientEmails, setRecipientEmails] = useState("");
   const [importHistory, setImportHistory] = useState<ImportHistory[]>([]);
 
   const { data: companies, isLoading: companiesLoading } = useCompanies();
   const importMutation = useImportTickets();
 
+  const selectedCompanyData = companies?.find(c => c.id.toString() === selectedCompany);
+
   const handleImport = async () => {
     if (!selectedCompany || !dateStart) return;
     
-    const company = companies?.find(c => c.id.toString() === selectedCompany);
+    const emailList = recipientEmails
+      .split(',')
+      .map(e => e.trim())
+      .filter(e => e.length > 0);
     
     try {
       const result = await importMutation.mutateAsync({
         company_id: parseInt(selectedCompany),
         date_start: dateStart,
         date_end: dateEnd || undefined,
+        send_email: sendEmail,
+        recipient_emails: sendEmail && emailList.length > 0 ? emailList : undefined,
       });
 
       setImportHistory(prev => [
         {
-          company: company?.name || "Unknown",
+          company: selectedCompanyData?.name || "Unknown",
           count: result.tickets_imported,
           time: "Just now",
           status: "success",
@@ -66,7 +78,7 @@ export const ImportTickets = () => {
     } catch {
       setImportHistory(prev => [
         {
-          company: company?.name || "Unknown",
+          company: selectedCompanyData?.name || "Unknown",
           count: 0,
           time: "Just now",
           status: "error",
@@ -151,7 +163,47 @@ export const ImportTickets = () => {
               </div>
             </div>
 
-            <Button 
+            {/* Email Options */}
+            <div className="space-y-4 pt-2 border-t border-border/50">
+              <div className="flex items-center justify-between">
+                <Label className="flex items-center gap-2 text-sm font-medium cursor-pointer">
+                  <Mail className="w-4 h-4 text-muted-foreground" />
+                  Send CSV via Email
+                </Label>
+                <Switch 
+                  checked={sendEmail} 
+                  onCheckedChange={setSendEmail}
+                />
+              </div>
+              
+              {sendEmail && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="space-y-2"
+                >
+                  <Label className="flex items-center gap-2 text-sm font-medium">
+                    <Send className="w-4 h-4 text-muted-foreground" />
+                    Recipients
+                  </Label>
+                  <Input 
+                    type="text"
+                    placeholder={selectedCompanyData?.email_recipients?.join(', ') || "email1@example.com, email2@example.com"}
+                    value={recipientEmails}
+                    onChange={(e) => setRecipientEmails(e.target.value)}
+                    className="h-12 rounded-xl border-border/50"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {selectedCompanyData?.email_recipients?.length 
+                      ? `Leave empty to use company defaults: ${selectedCompanyData.email_recipients.join(', ')}`
+                      : "Enter comma-separated email addresses"}
+                  </p>
+                </motion.div>
+              )}
+            </div>
+
+            <Button
               className="w-full h-12 gap-2 rounded-xl text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-200" 
               onClick={handleImport}
               disabled={importMutation.isPending || !selectedCompany || !dateStart}
@@ -218,7 +270,14 @@ export const ImportTickets = () => {
                 <p className="text-sm text-muted-foreground mt-1">
                   {status === "idle" && "Select a company and date range to begin"}
                   {status === "importing" && "Fetching data from external API..."}
-                  {status === "success" && importMutation.data && `${importMutation.data.tickets_imported} tickets imported in ${importMutation.data.processing_time}s`}
+                  {status === "success" && importMutation.data && (
+                    <>
+                      {importMutation.data.tickets_imported} imported, {importMutation.data.tickets_skipped} skipped in {importMutation.data.processing_time}s
+                      {importMutation.data.email_sent && (
+                        <span className="block text-success">✓ Email sent to {importMutation.data.recipients?.length || 0} recipient(s)</span>
+                      )}
+                    </>
+                  )}
                   {status === "error" && (importMutation.error?.message || "Connection error. Please try again.")}
                 </p>
               </div>

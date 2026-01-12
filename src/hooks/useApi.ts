@@ -72,12 +72,22 @@ export const useTicketStats = (params?: {
 export const useImportTickets = () => {
   const queryClient = useQueryClient();
   
-  return useMutation<ImportResult, Error, { company_id: number; date_start: string; date_end?: string }>({
+  return useMutation<ImportResult, Error, { 
+    company_id: number; 
+    date_start: string; 
+    date_end?: string;
+    send_email?: boolean;
+    recipient_emails?: string[];
+  }>({
     mutationFn: (data) => api.importTickets(data),
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ["tickets"] });
       queryClient.invalidateQueries({ queryKey: ["ticketStats"] });
-      toast.success(result.message);
+      let message = result.message;
+      if (result.email_sent) {
+        message += ` | Email sent to ${result.recipients?.length || 0} recipient(s)`;
+      }
+      toast.success(message);
     },
     onError: (error: Error) => {
       toast.error(error.message || "Import failed");

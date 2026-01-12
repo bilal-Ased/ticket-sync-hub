@@ -37,6 +37,9 @@ export interface ImportResult {
   success: boolean;
   message: string;
   tickets_imported: number;
+  tickets_skipped: number;
+  email_sent: boolean;
+  recipients?: string[];
   processing_time: number;
 }
 
@@ -136,6 +139,8 @@ class ApiClient {
     company_id: number;
     date_start: string;
     date_end?: string;
+    send_email?: boolean;
+    recipient_emails?: string[];
   }): Promise<ImportResult> {
     return this.request<ImportResult>('/tickets/import', {
       method: 'POST',
