@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api, Company, Ticket, TicketStats, ImportResult, ScheduledReport, ScheduledReportCreate, ScheduledReportUpdate, ReportExecution } from "@/lib/api";
+import { api, Company, Ticket, TicketStats, ImportResult, ScheduledReport, ScheduledReportCreate, ScheduledReportUpdate, ReportExecution, Opportunity, OpportunityStats } from "@/lib/api";
 import { toast } from "sonner";
 
 // Companies
@@ -65,6 +65,35 @@ export const useTicketStats = (params?: {
   return useQuery<TicketStats, Error>({
     queryKey: ["ticketStats", params],
     queryFn: () => api.getTicketStats(params),
+  });
+};
+
+// Opportunities
+export const useOpportunities = (params?: {
+  company_id?: number;
+  status?: string;
+  source?: string;
+  assigned_to?: string;
+  date_start?: string;
+  date_end?: string;
+  search?: string;
+  limit?: number;
+  offset?: number;
+}) => {
+  return useQuery<Opportunity[], Error>({
+    queryKey: ["opportunities", params],
+    queryFn: () => api.getOpportunities(params),
+  });
+};
+
+export const useOpportunityStats = (params?: {
+  company_id?: number;
+  date_start?: string;
+  date_end?: string;
+}) => {
+  return useQuery<OpportunityStats, Error>({
+    queryKey: ["opportunityStats", params],
+    queryFn: () => api.getOpportunityStats(params),
   });
 };
 

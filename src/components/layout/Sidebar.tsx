@@ -9,7 +9,8 @@ import {
   Settings,
   ChevronLeft,
   LogOut,
-  Zap
+  Zap,
+  Target
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
@@ -24,6 +25,7 @@ interface SidebarProps {
 const navItems = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
   { id: "tickets", label: "Tickets", icon: Ticket },
+  { id: "opportunities", label: "Opportunities", icon: Target },
   { id: "companies", label: "Companies", icon: Building2 },
   { id: "import", label: "Import", icon: Download },
   { id: "cron", label: "Cron Jobs", icon: Clock },

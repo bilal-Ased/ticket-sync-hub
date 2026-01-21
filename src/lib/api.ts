@@ -26,6 +26,35 @@ export interface Ticket {
   age_seconds: number;
 }
 
+export interface Opportunity {
+  id: number;
+  company_id: number;
+  opportunity_id: string;
+  opportunity_number: string;
+  customer_name: string;
+  customer_email?: string;
+  customer_phone?: string;
+  customer_type?: string;
+  customer_rating?: string;
+  company_name?: string;
+  location?: string;
+  age?: string;
+  status: string;
+  source?: string;
+  campaign?: string;
+  comments?: string;
+  date_created?: string;
+  created_by?: string;
+  assigned_to?: string;
+  asset_name?: string;
+}
+
+export interface OpportunityStats {
+  total: number;
+  by_status: Record<string, number>;
+  by_source: Record<string, number>;
+}
+
 export interface TicketStats {
   total: number;
   by_status: Record<string, number>;
@@ -231,6 +260,47 @@ class ApiClient {
     const params = new URLSearchParams({ company_id: String(company_id) });
     if (date_before) params.append('date_before', date_before);
     return this.request(`/tickets?${params}`, { method: 'DELETE' });
+  }
+
+  // Opportunities
+  async getOpportunities(params?: {
+    company_id?: number;
+    status?: string;
+    source?: string;
+    assigned_to?: string;
+    date_start?: string;
+    date_end?: string;
+    search?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<Opportunity[]> {
+    const searchParams = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          searchParams.append(key, String(value));
+        }
+      });
+    }
+    const query = searchParams.toString();
+    return this.request<Opportunity[]>(`/opportunities${query ? `?${query}` : ''}`);
+  }
+
+  async getOpportunityStats(params?: {
+    company_id?: number;
+    date_start?: string;
+    date_end?: string;
+  }): Promise<OpportunityStats> {
+    const searchParams = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          searchParams.append(key, String(value));
+        }
+      });
+    }
+    const query = searchParams.toString();
+    return this.request<OpportunityStats>(`/opportunities/stats${query ? `?${query}` : ''}`);
   }
 
   // Scheduled Reports
