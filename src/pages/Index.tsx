@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Dashboard } from "@/components/dashboard/Dashboard";
 import { TicketsList } from "@/components/tickets/TicketsList";
+import { OpportunitiesList } from "@/components/opportunities/OpportunitiesList";
 import { CompaniesList } from "@/components/companies/CompaniesList";
 import { ImportTickets } from "@/components/import/ImportTickets";
 import { CronJobs } from "@/components/cron/CronJobs";
@@ -19,6 +20,8 @@ const Index = () => {
         return <Dashboard />;
       case "tickets":
         return <TicketsList />;
+      case "opportunities":
+        return <OpportunitiesList />;
       case "companies":
         return <CompaniesList />;
       case "import":
