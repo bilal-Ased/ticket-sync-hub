@@ -55,6 +55,33 @@ export interface OpportunityStats {
   by_source: Record<string, number>;
 }
 
+// Queue Metrics
+export interface QueueMetricsRequest {
+  queues: string;
+  from_date: string;
+  to_date: string;
+  block: string;
+  json_format?: string;
+}
+
+export interface QueueMetricsPresetRequest {
+  queues: string;
+  date_range: 'today' | 'yesterday' | 'this_week' | 'last_week' | 'this_month' | 'last_month' | 'last_7_days' | 'last_30_days' | 'custom';
+  from_date?: string;
+  to_date?: string;
+  block: string;
+}
+
+export interface QueueMetricsResponse {
+  success: boolean;
+  data: Record<string, unknown>;
+  timestamp: string;
+}
+
+export interface AvailableBlocks {
+  blocks: string[];
+}
+
 export interface TicketStats {
   total: number;
   by_status: Record<string, number>;
@@ -379,6 +406,55 @@ class ApiClient {
     }
     const query = searchParams.toString();
     return this.request<ReportExecution[]>(`/scheduled-reports/executions/recent${query ? `?${query}` : ''}`);
+  }
+
+  // Queue Metrics
+  async getQueueMetricsBlocks(): Promise<AvailableBlocks> {
+    return this.request<AvailableBlocks>('/api/queuemetrics/blocks');
+  }
+
+  async getQueueMetricsStats(data: QueueMetricsRequest): Promise<QueueMetricsResponse> {
+    return this.request<QueueMetricsResponse>('/api/queuemetrics/stats', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async getQueueMetricsPreset(data: QueueMetricsPresetRequest): Promise<QueueMetricsResponse> {
+    return this.request<QueueMetricsResponse>('/api/queuemetrics/stats/preset', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async getQueueMetricsRealtime(queues: string = '*'): Promise<QueueMetricsResponse> {
+    return this.request<QueueMetricsResponse>(`/api/queuemetrics/realtime?queues=${encodeURIComponent(queues)}`);
+  }
+
+  async getAgentPerformance(params: {
+    from_date: string;
+    to_date: string;
+    queues?: string;
+  }): Promise<QueueMetricsResponse> {
+    const searchParams = new URLSearchParams({
+      from_date: params.from_date,
+      to_date: params.to_date,
+      queues: params.queues || '*',
+    });
+    return this.request<QueueMetricsResponse>(`/api/queuemetrics/agent-performance?${searchParams}`);
+  }
+
+  async getQueuePerformance(params: {
+    from_date: string;
+    to_date: string;
+    queues?: string;
+  }): Promise<QueueMetricsResponse> {
+    const searchParams = new URLSearchParams({
+      from_date: params.from_date,
+      to_date: params.to_date,
+      queues: params.queues || '*',
+    });
+    return this.request<QueueMetricsResponse>(`/api/queuemetrics/queue-performance?${searchParams}`);
   }
 }
 
