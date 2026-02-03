@@ -10,7 +10,8 @@ import {
   ChevronLeft,
   LogOut,
   Zap,
-  Target
+  Target,
+  Activity
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
@@ -26,6 +27,7 @@ const navItems = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
   { id: "tickets", label: "Tickets", icon: Ticket },
   { id: "opportunities", label: "Opportunities", icon: Target },
+  { id: "queuemetrics", label: "Queue Metrics", icon: Activity },
   { id: "companies", label: "Companies", icon: Building2 },
   { id: "import", label: "Import", icon: Download },
   { id: "cron", label: "Cron Jobs", icon: Clock },

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api, Company, Ticket, TicketStats, ImportResult, ScheduledReport, ScheduledReportCreate, ScheduledReportUpdate, ReportExecution, Opportunity, OpportunityStats } from "@/lib/api";
+import { api, Company, Ticket, TicketStats, ImportResult, ScheduledReport, ScheduledReportCreate, ScheduledReportUpdate, ReportExecution, Opportunity, OpportunityStats, QueueMetricsRequest, QueueMetricsPresetRequest, QueueMetricsResponse, AvailableBlocks } from "@/lib/api";
 import { toast } from "sonner";
 
 // Companies
@@ -215,5 +215,57 @@ export const useReportExecutions = (scheduleId: number, params?: { limit?: numbe
     queryKey: ["reportExecutions", scheduleId, params],
     queryFn: () => api.getReportExecutions(scheduleId, params),
     enabled: !!scheduleId,
+  });
+};
+
+// Queue Metrics
+export const useQueueMetricsBlocks = () => {
+  return useQuery<AvailableBlocks, Error>({
+    queryKey: ["queueMetricsBlocks"],
+    queryFn: () => api.getQueueMetricsBlocks(),
+  });
+};
+
+export const useQueueMetricsRealtime = (queues: string = '*') => {
+  return useQuery<QueueMetricsResponse, Error>({
+    queryKey: ["queueMetricsRealtime", queues],
+    queryFn: () => api.getQueueMetricsRealtime(queues),
+    refetchInterval: 30000, // Refresh every 30 seconds
+  });
+};
+
+export const useQueueMetricsStats = () => {
+  return useMutation<QueueMetricsResponse, Error, QueueMetricsRequest>({
+    mutationFn: (data) => api.getQueueMetricsStats(data),
+  });
+};
+
+export const useQueueMetricsPreset = () => {
+  return useMutation<QueueMetricsResponse, Error, QueueMetricsPresetRequest>({
+    mutationFn: (data) => api.getQueueMetricsPreset(data),
+  });
+};
+
+export const useAgentPerformance = (params?: {
+  from_date: string;
+  to_date: string;
+  queues?: string;
+}) => {
+  return useQuery<QueueMetricsResponse, Error>({
+    queryKey: ["agentPerformance", params],
+    queryFn: () => api.getAgentPerformance(params!),
+    enabled: !!params?.from_date && !!params?.to_date,
+  });
+};
+
+export const useQueuePerformance = (params?: {
+  from_date: string;
+  to_date: string;
+  queues?: string;
+}) => {
+  return useQuery<QueueMetricsResponse, Error>({
+    queryKey: ["queuePerformance", params],
+    queryFn: () => api.getQueuePerformance(params!),
+    enabled: !!params?.from_date && !!params?.to_date,
   });
 };

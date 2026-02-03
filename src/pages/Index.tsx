@@ -4,6 +4,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { Dashboard } from "@/components/dashboard/Dashboard";
 import { TicketsList } from "@/components/tickets/TicketsList";
 import { OpportunitiesList } from "@/components/opportunities/OpportunitiesList";
+import { QueueMetrics } from "@/components/queuemetrics/QueueMetrics";
 import { CompaniesList } from "@/components/companies/CompaniesList";
 import { ImportTickets } from "@/components/import/ImportTickets";
 import { CronJobs } from "@/components/cron/CronJobs";
@@ -22,6 +23,8 @@ const Index = () => {
         return <TicketsList />;
       case "opportunities":
         return <OpportunitiesList />;
+      case "queuemetrics":
+        return <QueueMetrics />;
       case "companies":
         return <CompaniesList />;
       case "import":
