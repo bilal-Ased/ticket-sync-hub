@@ -8,8 +8,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useQueueMetricsStats } from "@/hooks/useApi";
-import { Activity, TrendingUp, RefreshCw, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Activity, TrendingUp, RefreshCw, AlertCircle, CheckCircle2, ChevronLeft, ChevronRight } from "lucide-react";
 import { format, subDays } from "date-fns";
+import { cn } from "@/lib/utils";
 
 // Valid blocks based on your curl example - these work with QueueMetrics API
 const VALID_BLOCKS = [
@@ -20,6 +21,112 @@ const VALID_BLOCKS = [
   { value: "DetailsDO.AgentSession", label: "Agent Sessions" },
   { value: "DetailsDO.AgentPause", label: "Agent Pauses" },
 ] as const;
+
+// Results table component
+interface ResultsTableProps {
+  data: Record<string, unknown>;
+  block: string;
+}
+
+const ResultsTable = ({ data, block }: ResultsTableProps) => {
+  const [page, setPage] = useState(0);
+  const itemsPerPage = 10;
+  
+  // Extract the array from the data object based on block name
+  const blockData = data[block] as Record<string, unknown>[] | undefined;
+  
+  if (!blockData || !Array.isArray(blockData)) {
+    return (
+      <div className="text-center text-muted-foreground py-8">
+        <p>No tabular data found for this block</p>
+      </div>
+    );
+  }
+
+  if (blockData.length === 0) {
+    return (
+      <div className="text-center text-muted-foreground py-8">
+        <p>No records returned</p>
+      </div>
+    );
+  }
+
+  // Get column names from first record
+  const columns = Object.keys(blockData[0] || {});
+  
+  // Key columns to prioritize display
+  const priorityColumns = ['Date', 'Queue', 'Caller', 'Handled by', 'Duration', 'Wait', 'Code', 'Disconnection'];
+  const sortedColumns = [
+    ...priorityColumns.filter(col => columns.includes(col)),
+    ...columns.filter(col => !priorityColumns.includes(col) && col !== '...'),
+  ].filter(col => col !== '...');
+
+  const totalPages = Math.ceil(blockData.length / itemsPerPage);
+  const paginatedData = blockData.slice(page * itemsPerPage, (page + 1) * itemsPerPage);
+
+  return (
+    <div className="space-y-4">
+      <div className="overflow-x-auto border border-border rounded-lg">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b bg-muted/50">
+              {sortedColumns.map((col) => (
+                <th key={col} className="px-4 py-3 text-left font-semibold whitespace-nowrap">
+                  {col}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {paginatedData.map((row, idx) => (
+              <tr key={idx} className={cn(
+                "border-b hover:bg-muted/50 transition-colors",
+                idx % 2 === 0 ? "" : "bg-muted/20"
+              )}>
+                {sortedColumns.map((col) => (
+                  <td key={col} className="px-4 py-3 max-w-xs overflow-hidden text-ellipsis whitespace-nowrap text-foreground">
+                    {String(row[col] || "—")}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Pagination */}
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-muted-foreground">
+          Showing <span className="font-medium text-foreground">{paginatedData.length}</span> of{" "}
+          <span className="font-medium text-foreground">{blockData.length}</span> records
+        </p>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={page === 0}
+            onClick={() => setPage(p => Math.max(0, p - 1))}
+          >
+            <ChevronLeft className="w-4 h-4" />
+            Previous
+          </Button>
+          <span className="text-sm font-medium px-2">
+            {page + 1} / {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={page >= totalPages - 1}
+            onClick={() => setPage(p => p + 1)}
+          >
+            Next
+            <ChevronRight className="w-4 h-4" />
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const DATE_PRESETS = [
   { value: "today", label: "Today" },
@@ -229,15 +336,11 @@ export const QueueMetrics = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="w-5 h-5" />
-              Query Results
+              Query Results ({block})
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto">
-              <pre className="text-sm bg-muted p-4 rounded-lg overflow-auto max-h-[500px]">
-                {JSON.stringify(statsMutation.data.data, null, 2)}
-              </pre>
-            </div>
+            <ResultsTable data={statsMutation.data.data} block={block} />
           </CardContent>
         </Card>
       )}
